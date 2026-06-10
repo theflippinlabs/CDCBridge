@@ -1,0 +1,20 @@
+{
+  "name": "vaultbridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VaultBridge by Flipping Labs — secure NFT bulk withdrawal assistant for Crypto.com NFT users.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace @vaultbridge/shared",
+    "dev:backend": "npm run dev --workspace @vaultbridge/backend",
+    "dev:frontend": "npm run dev --workspace @vaultbridge/frontend",
+    "build": "npm run build:shared && npm run build --workspace @vaultbridge/backend && npm run build --workspace @vaultbridge/frontend",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
