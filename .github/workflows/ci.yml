@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'feature/**', 'claude/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: typecheck & build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      # The backend and frontend import @vaultbridge/shared from its built dist,
+      # so the shared package must be compiled before typechecking the apps.
+      - name: Build shared package
+        run: npm run build:shared
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
