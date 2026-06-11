@@ -17,7 +17,6 @@ export const config = {
   supabaseUrl: required('SUPABASE_URL'),
   supabaseAnonKey: required('SUPABASE_ANON_KEY'),
   supabaseServiceRoleKey: required('SUPABASE_SERVICE_ROLE_KEY'),
-  supabaseJwtSecret: required('SUPABASE_JWT_SECRET'),
   corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
     .split(',')
     .map((o) => o.trim())

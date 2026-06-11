@@ -92,8 +92,9 @@ Copy the examples and fill in values from Supabase → **Settings → API**:
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env
 ```
-- Backend needs `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-  and `SUPABASE_JWT_SECRET` (Settings → API → JWT Secret).
+- Backend needs `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and
+  `SUPABASE_SERVICE_ROLE_KEY` (Settings → API). Access tokens are validated via
+  Supabase, so no JWT secret is required.
 - Frontend needs `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
   `VITE_API_BASE_URL` (default `http://localhost:4000`).
 
@@ -159,7 +160,7 @@ Row Level Security guarantees you only ever touch your own rows.
    Railway's root to the repo and build with `npm run build`. Start command:
    `npm run start --workspace @vaultbridge/backend` (a `Procfile` is included).
 4. Add env vars: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `SUPABASE_JWT_SECRET`, `CORS_ORIGINS=https://your-frontend.vercel.app`, `PORT`.
+   `CORS_ORIGINS=https://your-frontend.vercel.app`, `PORT`.
 
 ### Frontend → Vercel
 1. Import the repo. Set **root directory** to `apps/frontend`.
