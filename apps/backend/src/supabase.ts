@@ -1,5 +1,13 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
 import { config } from './config.js';
+
+// @supabase/realtime-js requires a global WebSocket at client construction.
+// Node < 22 has none, so provide one. (The backend never uses realtime, but
+// the Supabase client still instantiates a realtime client internally.)
+if (!(globalThis as { WebSocket?: unknown }).WebSocket) {
+  (globalThis as { WebSocket?: unknown }).WebSocket = WebSocket;
+}
 
 /**
  * A client scoped to a specific user's access token.
