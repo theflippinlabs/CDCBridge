@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { config } from './config.js';
 import { requireAuth } from './middleware/auth.js';
 import { errorHandler } from './middleware/error.js';
 import { healthRouter } from './routes/health.js';
@@ -13,13 +12,13 @@ import { exportRouter } from './routes/export.js';
 export function createApp() {
   const app = express();
 
-  // CORS. Auth is enforced by bearer tokens (not cookies), so we can safely
-  // reflect any origin unless an explicit allow-list is configured. We also
-  // register an explicit preflight handler so OPTIONS requests always get the
-  // proper headers before hitting the auth middleware.
-  const allowAllOrigins = config.corsOrigins.length === 0 || config.corsOrigins.includes('*');
+  // CORS. Auth is enforced by bearer tokens (not cookies), so reflecting any
+  // origin is safe for this API. We reflect unconditionally so the app keeps
+  // working regardless of how CORS_ORIGINS is configured in the host. An
+  // explicit preflight handler guarantees OPTIONS gets the right headers
+  // before the auth middleware runs.
   const corsOptions = {
-    origin: allowAllOrigins ? true : config.corsOrigins,
+    origin: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   };

@@ -6,7 +6,7 @@ healthRouter.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     service: 'vaultbridge-backend',
-    version: 'cors-open-v3',
+    version: 'cors-reflect-v4',
     time: new Date().toISOString(),
   });
 });
