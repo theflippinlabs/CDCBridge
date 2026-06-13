@@ -13,16 +13,18 @@ import { exportRouter } from './routes/export.js';
 export function createApp() {
   const app = express();
 
-  // When CORS_ORIGINS is "*" (or unset), reflect any origin. Reflecting the
-  // request origin — rather than the literal "*" — keeps it compatible with
-  // credentialed requests. Otherwise, use the explicit allow-list.
+  // CORS. Auth is enforced by bearer tokens (not cookies), so we can safely
+  // reflect any origin unless an explicit allow-list is configured. We also
+  // register an explicit preflight handler so OPTIONS requests always get the
+  // proper headers before hitting the auth middleware.
   const allowAllOrigins = config.corsOrigins.length === 0 || config.corsOrigins.includes('*');
-  app.use(
-    cors({
-      origin: allowAllOrigins ? true : config.corsOrigins,
-      credentials: true,
-    }),
-  );
+  const corsOptions = {
+    origin: allowAllOrigins ? true : config.corsOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
   app.use(express.json({ limit: '5mb' }));
 
   // Public health check.
