@@ -10,15 +10,14 @@ import type {
   WithdrawalBatchItemWithNft,
 } from '@vaultbridge/shared';
 
-// The deployed backend. Hardcoded so a mistyped VITE_API_BASE_URL can never
-// break production. The env var is honored only for local development
-// (a localhost URL), otherwise we always use the known backend.
-const DEFAULT_API_BASE = 'https://vaultbridgebackend-production.up.railway.app';
-
+// In production the frontend calls its own origin ("" => /api/...), and Vercel
+// proxies /api/* to the backend (see vercel.json). This avoids cross-origin
+// requests entirely, so there is no CORS to misconfigure. For local dev, set
+// VITE_API_BASE_URL to the backend (e.g. http://localhost:4000).
 function resolveApiBase(): string {
   const raw = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim().replace(/\/+$/, '');
   if (raw && raw.includes('localhost')) return raw;
-  return DEFAULT_API_BASE;
+  return '';
 }
 
 const BASE = resolveApiBase();
