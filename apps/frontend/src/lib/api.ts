@@ -10,7 +10,12 @@ import type {
   WithdrawalBatchItemWithNft,
 } from '@vaultbridge/shared';
 
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:4000';
+// Default to the deployed backend so the app works even if VITE_API_BASE_URL
+// isn't configured at build time. Set VITE_API_BASE_URL to override (e.g.
+// http://localhost:4000 for local development).
+const DEFAULT_API_BASE = 'https://vaultbridgebackend-production.up.railway.app';
+const rawBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+const BASE = (rawBase && rawBase.length > 0 ? rawBase : DEFAULT_API_BASE).replace(/\/+$/, '');
 
 export class ApiRequestError extends Error {
   status: number;
