@@ -10,24 +10,15 @@ import type {
   WithdrawalBatchItemWithNft,
 } from '@vaultbridge/shared';
 
-// Default to the deployed backend so the app works even if VITE_API_BASE_URL
-// isn't configured at build time. Set VITE_API_BASE_URL to override (e.g.
-// http://localhost:4000 for local development).
+// The deployed backend. Hardcoded so a mistyped VITE_API_BASE_URL can never
+// break production. The env var is honored only for local development
+// (a localhost URL), otherwise we always use the known backend.
 const DEFAULT_API_BASE = 'https://vaultbridgebackend-production.up.railway.app';
 
 function resolveApiBase(): string {
   const raw = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim().replace(/\/+$/, '');
-  if (!raw) return DEFAULT_API_BASE;
-  // Guard against a misconfiguration where the API URL points at the frontend
-  // itself — that would return HTML and crash the app. Fall back to the API.
-  try {
-    if (typeof window !== 'undefined' && new URL(raw).origin === window.location.origin) {
-      return DEFAULT_API_BASE;
-    }
-  } catch {
-    return DEFAULT_API_BASE;
-  }
-  return raw;
+  if (raw && raw.includes('localhost')) return raw;
+  return DEFAULT_API_BASE;
 }
 
 const BASE = resolveApiBase();
