@@ -13,9 +13,13 @@ import { exportRouter } from './routes/export.js';
 export function createApp() {
   const app = express();
 
+  // When CORS_ORIGINS is "*" (or unset), reflect any origin. Reflecting the
+  // request origin — rather than the literal "*" — keeps it compatible with
+  // credentialed requests. Otherwise, use the explicit allow-list.
+  const allowAllOrigins = config.corsOrigins.length === 0 || config.corsOrigins.includes('*');
   app.use(
     cors({
-      origin: config.corsOrigins.length ? config.corsOrigins : true,
+      origin: allowAllOrigins ? true : config.corsOrigins,
       credentials: true,
     }),
   );
