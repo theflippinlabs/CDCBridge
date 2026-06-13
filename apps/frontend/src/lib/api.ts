@@ -14,8 +14,23 @@ import type {
 // isn't configured at build time. Set VITE_API_BASE_URL to override (e.g.
 // http://localhost:4000 for local development).
 const DEFAULT_API_BASE = 'https://vaultbridgebackend-production.up.railway.app';
-const rawBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
-const BASE = (rawBase && rawBase.length > 0 ? rawBase : DEFAULT_API_BASE).replace(/\/+$/, '');
+
+function resolveApiBase(): string {
+  const raw = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim().replace(/\/+$/, '');
+  if (!raw) return DEFAULT_API_BASE;
+  // Guard against a misconfiguration where the API URL points at the frontend
+  // itself — that would return HTML and crash the app. Fall back to the API.
+  try {
+    if (typeof window !== 'undefined' && new URL(raw).origin === window.location.origin) {
+      return DEFAULT_API_BASE;
+    }
+  } catch {
+    return DEFAULT_API_BASE;
+  }
+  return raw;
+}
+
+const BASE = resolveApiBase();
 
 export class ApiRequestError extends Error {
   status: number;
@@ -50,6 +65,11 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const message =
       (isJson && (payload as { error?: string }).error) || `Request failed (${res.status})`;
     throw new ApiRequestError(res.status, message, payload);
+  }
+  if (!isJson) {
+    // A non-JSON 2xx response means we hit the wrong host (e.g. HTML from the
+    // frontend). Fail loudly instead of returning HTML that crashes the UI.
+    throw new ApiRequestError(res.status, 'Unexpected non-JSON response from the API.', payload);
   }
   return payload as T;
 }
