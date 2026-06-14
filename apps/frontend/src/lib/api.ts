@@ -44,7 +44,15 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...(await authHeader()),
     ...((init.headers as Record<string, string>) ?? {}),
   };
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
+  const url = `${BASE}${path}`;
+  let res: Response;
+  try {
+    res = await fetch(url, { ...init, headers });
+  } catch (e) {
+    // Surface the exact target URL so connectivity issues are diagnosable.
+    const cause = e instanceof Error ? e.message : String(e);
+    throw new ApiRequestError(0, `Network error calling ${init.method ?? 'GET'} ${url} — ${cause}`);
+  }
 
   if (res.status === 204) return undefined as T;
 
